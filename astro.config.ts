@@ -44,6 +44,9 @@ export default defineConfig({
     },
     optimizeDeps: {
       include: ['@excalidraw/excalidraw']
+    },
+    preview: {
+      allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top']
     }
   },
 
