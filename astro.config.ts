@@ -46,7 +46,7 @@ export default defineConfig({
       include: ['@excalidraw/excalidraw']
     },
     preview: {
-      allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top']
+      allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top', 'jerryplusy.ink']
     }
   },
 
