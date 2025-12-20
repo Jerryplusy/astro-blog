@@ -33,7 +33,8 @@ export default defineConfig({
   // root: './my-project-directory',
   server: {
     host: true,
-    port: 4321
+    port: 4321,
+    allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top', 'jerryplusy.ink']
   },
 
   // [Vite Configuration]
@@ -44,6 +45,9 @@ export default defineConfig({
     },
     optimizeDeps: {
       include: ['@excalidraw/excalidraw']
+    },
+    server: {
+      allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top', 'jerryplusy.ink']
     },
     preview: {
       allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top', 'jerryplusy.ink']
