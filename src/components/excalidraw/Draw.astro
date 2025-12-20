@@ -1,0 +1,34 @@
+---
+import ReactDraw from './DrawReact.tsx';
+
+interface DrawProps {
+  children?: any;
+  data?: string;
+  width?: string;
+  height?: string;
+  className?: string;
+  viewModeEnabled?: boolean;
+  zenModeEnabled?: boolean;
+}
+
+const { 
+  children,
+  data, 
+  width = "100%", 
+  height = "400px", 
+  className = "",
+  viewModeEnabled = true,
+  zenModeEnabled = false
+}: DrawProps = Astro.props;
+---
+
+<ReactDraw
+  client:load
+  {children}
+  {data}
+  {width}
+  {height}
+  {className}
+  {viewModeEnabled}
+  {zenModeEnabled}
+/>

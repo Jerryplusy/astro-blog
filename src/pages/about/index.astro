@@ -1,0 +1,203 @@
+---
+import { Button, Collapse, Spoiler, Timeline } from 'astro-pure/user'
+import PageLayout from '@/layouts/CommonPage.astro'
+import Substats from '@/components/about/Substats.astro'
+import ToolSection from '@/components/about/ToolSection.astro'
+
+const headings = [
+  { depth: 2, slug: 'tools', text: 'Tools' },
+  { depth: 2, slug: 'about-blog', text: 'About Blog' }
+]
+---
+
+<PageLayout title='About' {headings} comment>
+  <p>Student / Developer / Designer</p>
+  <p>你好，我是Jerry，是个在读高中生。</p>
+  <p>虽然位于学校的信竞校队，但我更对前端/全栈/人工智能感兴趣。</p>
+  <p>我喜欢玩Minecraft，音游，米游。</p>
+  <p>
+    <del>不知道从哪抄来的</del>Motto:<br /> Stay hungry, Stay foolish. <br />
+    <Spoiler>なんで春日影やったの！？</Spoiler>
+  </p>
+
+  {/* tools */}
+  <h2 id='tools'>Tools</h2>
+  <p>这些是我经常使用的工具</p>
+  <ToolSection
+    class='mb-5'
+    title='Productivity'
+    tools={[
+      {
+        name: 'Chrome',
+        description: 'The source of all things',
+        href: 'https://www.google.com/chrome/',
+        icon: import('@/assets/tools/chrome.svg?raw')
+      },
+      {
+        name: 'Clash Nyanpasu',
+        description: 'The magic of efficient work :)',
+        href: 'https://github.com/libnyanpasu/clash-nyanpasu',
+        icon: import('@/assets/tools/clash.svg?raw')
+      },
+      {
+        name: 'Office',
+        description: 'Work efficiently',
+        href: 'https://office.com/',
+        icon: import('@/assets/tools/office.svg?raw')
+      },
+      {
+        name: 'Typora',
+        description: 'Markdown Editor',
+        href: 'https://typora.io/',
+        icon: import('@/assets/tools/typora.svg?raw')
+      },
+      {
+        name: 'Apple Music',
+        description: 'I love music!',
+        href: 'https://music.apple.com/',
+        icon: import('@/assets/tools/music.svg?raw')
+      },
+      {
+        name: 'Notepad 4',
+        description: 'It just FAST!',
+        href: 'https://github.com/zufuliu/notepad4',
+        icon: import('@/assets/tools/notepad.svg?raw')
+      }
+    ]}
+  />
+  <ToolSection
+    class='mb-5'
+    title='Development'
+    tools={[
+      {
+        name: 'Webstorm',
+        description: 'The best IDE!',
+        href: 'https://www.jetbrains.com/webstorm/',
+        icon: import('@/assets/tools/webstorm.svg?raw')
+      },
+      {
+        name: 'VS Code',
+        description: '微软大战代码',
+        href: 'https://code.visualstudio.com/',
+        icon: import('@/assets/tools/vscode.svg?raw')
+      },
+      {
+        name: 'Clion',
+        description: 'It is free now',
+        href: 'https://www.jetbrains.com/clion/',
+        icon: import('@/assets/tools/clion.svg?raw')
+      }
+    ]}
+  />
+  <ToolSection
+    class='mb-5'
+    title='Environment'
+    tools={[
+      {
+        name: 'Ubuntu 24.04 LTS',
+        description: 'Linux Distribution',
+        href: 'https://ubuntu.com/',
+        icon: import('@/assets/tools/ubuntu.svg?raw')
+      },
+      {
+        name: 'Debian 12',
+        description: 'Linux Distribution',
+        href: 'https://debian.org/',
+        icon: import('@/assets/tools/debian.svg?raw')
+      },
+      {
+        name: 'MacOS Tahoe',
+        description: 'MacBook Air',
+        href: 'https://www.apple.com/macos/',
+        icon: import('@/assets/tools/apple.svg?raw')
+      },
+      {
+        name: 'Windows 11',
+        description: 'Microsoft Surface Pro',
+        href: 'https://news.microsoft.com/windows11-general-availability/',
+        icon: import('@/assets/tools/windows11.svg?raw')
+      }
+    ]}
+  />
+  <ToolSection
+    class='mb-5'
+    title='Runtime & Packages'
+    tools={[
+      {
+        name: 'Node.JS',
+        description: 'Run Javascript everywhere✨',
+        href: 'https://nodejs.org/',
+        icon: import('@/assets/tools/node.svg?raw')
+      },
+      {
+        name: 'Bun',
+        description: 'Faster and faster',
+        href: 'https://bun.sh/',
+        icon: import('@/assets/tools/bun.svg?raw')
+      },
+      {
+        name: 'JavaScript',
+        description: 'Everywhere',
+        href: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/',
+        icon: import('@/assets/tools/js.svg?raw')
+      },
+      {
+        name: 'TypeScript',
+        description: 'Safe & Type strong',
+        href: 'https://www.typescriptlang.org/',
+        icon: import('@/assets/tools/ts.svg?raw')
+      },
+      {
+        name: 'React',
+        description: 'More modular',
+        href: 'https://react.dev/',
+        icon: import('@/assets/tools/react.svg?raw')
+      },
+      {
+        name: 'Vite',
+        description: 'Very convenient',
+        href: 'https://vitejs.dev/',
+        icon: import('@/assets/tools/vite.svg?raw')
+      },
+      {
+        name: 'Next.js',
+        description: 'Meet the frontend ❤',
+        href: 'https://nextjs.org/',
+        icon: import('@/assets/tools/nextjs.svg?raw')
+      },
+      {
+        name: 'Nest.js',
+        description: 'Beginning of one service.',
+        href: 'https://nestjs.com/',
+        icon: import('@/assets/tools/nestjs.svg?raw')
+      },
+      {
+        name: 'TailWind CSS',
+        description: 'Modern solutions of CSS',
+        href: 'https://tailwindcss.com/',
+        icon: import('@/assets/tools/tailwind.svg?raw')
+      },
+      {
+        name: 'C/C++',
+        description: 'Super fast!',
+        href: 'https://learn.microsoft.com/zh-cn/cpp/cpp/welcome-back-to-cpp-modern-cpp/',
+        icon: import('@/assets/tools/cpp.svg?raw')
+      }
+    ]}
+  />
+
+  {/* about-blog */}
+  <h2 id='about-blog'>About Blog</h2>
+  <p>希望这个小小的博客，能够成为你我与世界连接的桥梁！</p>
+  <ul>
+    <li>域名: <a href='#' target='_blank'>Spaceship</a></li>
+    <li>
+      框架 & 主题: <a href='https://astro.build/' target='_blank'>Astro & Astro Theme Pure</a>
+    </li>
+    <li>评论系统: <a href='https://waline.js.org' target='_blank'>Waline</a></li>
+    <li>
+      访问统计: <a href='https://supabase.com/' target='_blank'>Supabase</a> +
+      <a href='https://waline.js.org/' target='_blank'>Waline</a>
+    </li>
+  </ul>
+</PageLayout>

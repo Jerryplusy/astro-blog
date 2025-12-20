@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets'
+
+import { Collapse } from 'astro-pure/user'
+import PageLayout from '@/layouts/CommonPage.astro'
+import ProjectSection from '@/components/projects/ProjectSection.astro'
+
+const headings = [
+  { depth: 2, slug: 'programs', text: 'Programs' },
+  { depth: 2, slug: 'learnings', text: 'Learnings' }
+]
+---
+
+<PageLayout title='Projects' {headings} view>
+  <p>Github Activities:</p>
+  <p>
+    <Image
+      src='https://ghchart.rshah.org/659eb9/Jerryplusy'
+      alt='github activities'
+      inferSize
+      loading='lazy'
+    />
+  </p>
+
+  <h2 id='programs'>Programs</h2>
+  <ProjectSection
+    projects={[
+      {
+        name: 'Crystelf-core',
+        description: 'A simple, fast and powerful api.',
+        links: [
+          { type: 'github', href: 'https://github.com/crystelf/crystelf-core' },
+          { type: 'doc', href: 'https://docs.crystelf.top/core' }
+        ]
+      }
+    ]}
+  />
+  <Collapse title='Some old projects'>
+    <ProjectSection projects={[]} />
+  </Collapse>
+
+  <h2 id='learnings'>Learnings</h2>
+  <ProjectSection class='my-2' projects={[]} />
+</PageLayout>

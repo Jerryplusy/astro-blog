@@ -1,0 +1,226 @@
+---
+title: '使用Nginx配合网页反代及内网穿透快速构建web内容'
+publishDate: '2025-12-20'
+description: '介绍如何使用Nginx部署网站和反代服务，并结合frp实现内网穿透，最后引入Certbot实现HTTPS支持'
+tags:
+  - Nginx
+  - frp
+language: 'Chinese'
+draft: false
+---
+import Draw from '../../../components/excalidraw/Draw.astro';
+
+在构建和部署 Web 服务时，**Nginx** 作为轻量、高性能的 HTTP 服务器和反向代理工具，几乎是所有运维的必备利器。而对于云服务器资源有限的情况，还可以通过 **frp** 结合 Nginx 实现内网穿透，让你在本地跑服务、远程部署，灵活又高效
+
+> 这篇文章将带你从 Nginx 的原理入手，逐步实践从部署 Nginx 到结合反代和 frp 打通内外网络，构建完整 Web 服务，并自动签发 HTTPS 证书
+
+### Nginx原理
+
+Nginx 全称 **Engine X**，是一款高性能、事件驱动的 Web 服务器与反向代理服务器。它最擅长处理静态内容与高并发连接，工作机制如下：
+
+- **事件驱动**：采用 epoll/kqueue 实现高效异步 I/O
+
+- **模块化架构**：支持通过模块扩展功能，如限速、防火墙、反代、缓存等
+
+- **反向代理**：客户端请求并不直接访问目标服务，而是先到 Nginx，由它将请求“反向”转发到实际服务（如 Node.js、Python、PHP 等）上
+
+<Draw data='{"type":"excalidraw/clipboard","elements":[{"id":"RmrCpNmzmhamx6SiP1vf8","type":"rectangle","x":342.7629811318299,"y":52.584574451948555,"width":836.528744191444,"height":626.1877015768325,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#b2f2bb","fillStyle":"hachure","strokeWidth":1,"strokeStyle":"dotted","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"Zz","roundness":{"type":3},"seed":1063170918,"version":134,"versionNonce":1964864698,"isDeleted":false,"boundElements":null,"updated":1749349671029,"link":null,"locked":false},{"id":"ktZWbSwSw4h-BgD1kVLXV","type":"rectangle","x":137.0674157889353,"y":326.0692908110675,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#a5d8ff","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aJ","roundness":{"type":3},"seed":1634465018,"version":203,"versionNonce":415597926,"isDeleted":false,"boundElements":[{"type":"text","id":"vxaUMwFrsCFsX0wLCtZex"},{"id":"H8rKEEisbVNsXKp-wykBr","type":"arrow"}],"updated":1749349638194,"link":null,"locked":false},{"id":"vxaUMwFrsCFsX0wLCtZex","type":"text","x":201.1891204829264,"y":349.1592427969868,"width":40,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aK","roundness":null,"seed":1052976378,"version":86,"versionNonce":731257766,"isDeleted":false,"boundElements":null,"updated":1749349627331,"link":null,"locked":false,"text":"用户","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"ktZWbSwSw4h-BgD1kVLXV","originalText":"用户","autoResize":true,"lineHeight":1.25},{"id":"B-TnjMweULNOknk3E1GxC","type":"rectangle","x":405.37484925034073,"y":326.0692909916057,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aM","roundness":{"type":3},"seed":541229306,"version":255,"versionNonce":831663994,"isDeleted":false,"boundElements":[{"type":"text","id":"FYv08SsBQFk\_kQ1sVy9-5"},{"id":"H8rKEEisbVNsXKp-wykBr","type":"arrow"},{"id":"UKGLiX0p-YH-EFR8Vn2mr","type":"arrow"}],"updated":1749349704594,"link":null,"locked":false},{"id":"FYv08SsBQFk\_kQ1sVy9-5","type":"text","x":459.8365807998006,"y":349.159242977525,"width":59.3199462890625,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aN","roundness":null,"seed":352080314,"version":145,"versionNonce":2001260282,"isDeleted":false,"boundElements":[],"updated":1749349687624,"link":null,"locked":false,"text":"server","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"B-TnjMweULNOknk3E1GxC","originalText":"server","autoResize":true,"lineHeight":1.25},{"id":"IOPp3pUqgazx4gwIefWlq","type":"rectangle","x":672.6038000308,"y":326.06929072960145,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aP","roundness":{"type":3},"seed":913268602,"version":237,"versionNonce":1267717306,"isDeleted":false,"boundElements":\[{"type":"text","id":"gjlrOQGRrFscPA7Yyh-eR"},{"id":"UKGLiX0p-YH-EFR8Vn2mr","type":"arrow"},{"id":"dVeEnMFPXne3mLIwyw8Mb","type":"arrow"}],"updated":1749349719454,"link":null,"locked":false},{"id":"gjlrOQGRrFscPA7Yyh-eR","type":"text","x":718.4455288336778,"y":349.15924271552075,"width":76.55995178222656,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aQ","roundness":null,"seed":1057579066,"version":129,"versionNonce":290682086,"isDeleted":false,"boundElements":\[],"updated":1749349386763,"link":null,"locked":false,"text":"location","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"IOPp3pUqgazx4gwIefWlq","originalText":"location","autoResize":true,"lineHeight":1.25},{"id":"So6T6xOhO9V59KYyzF9RR","type":"rectangle","x":939.8327502420718,"y":326.0692910156056,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aR","roundness":{"type":3},"seed":1874106022,"version":288,"versionNonce":671591866,"isDeleted":false,"boundElements":\[{"type":"text","id":"yqQ8nIh5X5QWZHMHMRpx3"},{"id":"dVeEnMFPXne3mLIwyw8Mb","type":"arrow"},{"id":"H8VxDQhA12P3wJJzdEzri","type":"arrow"},{"id":"64WPH\_tyCWlN53uyaeLa-","type":"arrow"},{"id":"imgn4DN8LQitiCCaHZoXr","type":"arrow"}],"updated":1749349826828,"link":null,"locked":false},{"id":"yqQ8nIh5X5QWZHMHMRpx3","type":"text","x":980.4644875898715,"y":349.1592430015249,"width":86.97993469238281,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aS","roundness":null,"seed":125227494,"version":186,"versionNonce":1386318842,"isDeleted":false,"boundElements":\[],"updated":1749349397288,"link":null,"locked":false,"text":"upstream","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"So6T6xOhO9V59KYyzF9RR","originalText":"upstream","autoResize":true,"lineHeight":1.25},{"id":"lk2BLB8WQ7HJT3TfoPR7-","type":"rectangle","x":1207.0617007303836,"y":326.0692911453513,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":[],"frameId":null,"index":"aT","roundness":{"type":3},"seed":1485361082,"version":320,"versionNonce":590475642,"isDeleted":false,"boundElements":\[{"type":"text","id":"qxpKZZkM0rHkVXco7AKDt"},{"id":"64WPH\_tyCWlN53uyaeLa-","type":"arrow"}],"updated":1749349775299,"link":null,"locked":false},{"id":"qxpKZZkM0rHkVXco7AKDt","type":"text","x":1266.3334222090425,"y":349.1592431312706,"width":49.69996643066406,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aU","roundness":null,"seed":1963640954,"version":228,"versionNonce":2099304806,"isDeleted":false,"boundElements":\[],"updated":1749349454933,"link":null,"locked":false,"text":"web2","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"lk2BLB8WQ7HJT3TfoPR7-","originalText":"web2","autoResize":true,"lineHeight":1.25},{"id":"OMK-Nu842s0oxxKk3-IDo","type":"rectangle","x":1207.0616997175582,"y":481.09084323964106,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aV","roundness":{"type":3},"seed":1287213350,"version":544,"versionNonce":1143266042,"isDeleted":false,"boundElements":[{"type":"text","id":"EJIV2oBuP1DNtadRQun6g"},{"id":"imgn4DN8LQitiCCaHZoXr","type":"arrow"}],"updated":1749349831622,"link":null,"locked":false},{"id":"EJIV2oBuP1DNtadRQun6g","type":"text","x":1267.2534269945572,"y":504.18079522556036,"width":47.859954833984375,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aW","roundness":null,"seed":151010406,"version":449,"versionNonce":560327078,"isDeleted":false,"boundElements":\[],"updated":1749349831622,"link":null,"locked":false,"text":"web3","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"OMK-Nu842s0oxxKk3-IDo","originalText":"web3","autoResize":true,"lineHeight":1.25},{"id":"U09Ff87hN7lvEfVF4JMcj","type":"rectangle","x":1207.0617000731038,"y":171.04773898316898,"width":168.24340938798218,"height":71.17990397183861,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aX","roundness":{"type":3},"seed":218978298,"version":504,"versionNonce":1226147366,"isDeleted":false,"boundElements":\[{"type":"text","id":"ZZO11j2Xd3T8-J53uxz43"},{"id":"H8VxDQhA12P3wJJzdEzri","type":"arrow"}],"updated":1749349815977,"link":null,"locked":false},{"id":"ZZO11j2Xd3T8-J53uxz43","type":"text","x":1269.0634249086966,"y":194.13769096908828,"width":44.239959716796875,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"aY","roundness":null,"seed":1884571834,"version":411,"versionNonce":562681658,"isDeleted":false,"boundElements":\[],"updated":1749349815977,"link":null,"locked":false,"text":"web1","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"U09Ff87hN7lvEfVF4JMcj","originalText":"web1","autoResize":true,"lineHeight":1.25},{"id":"AC\_kZhsQrVGpe4qsD9Zd5","type":"text","x":989.5012443434234,"y":94.89455428822106,"width":50.559967041015625,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"af","roundness":null,"seed":1819447462,"version":9,"versionNonce":1610287782,"isDeleted":false,"boundElements":null,"updated":1749349534857,"link":null,"locked":false,"text":"Nginx","fontSize":20,"fontFamily":5,"textAlign":"left","verticalAlign":"top","containerId":null,"originalText":"Nginx","autoResize":true,"lineHeight":1.25},{"id":"H8rKEEisbVNsXKp-wykBr","type":"arrow","x":316.7044817479359,"y":356.893958997275,"width":87.75164982804063,"height":2.08932499590577,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"ak","roundness":{"type":2},"seed":610252134,"version":129,"versionNonce":302571450,"isDeleted":false,"boundElements":\[{"type":"text","id":"fxipZ976CxE6KbdOJPMQm"}],"updated":1749349687625,"link":null,"locked":false,"points":\[\[0,0],\[87.75164982804063,2.08932499590577]],"lastCommittedPoint":\[112.24529338113553,2.6725069852651586],"startBinding":{"elementId":"ktZWbSwSw4h-BgD1kVLXV","focus":-0.18725526585429095,"gap":12.733007883099788},"endBinding":{"elementId":"B-TnjMweULNOknk3E1GxC","focus":0.017322097901590842,"gap":1},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false},{"id":"fxipZ976CxE6KbdOJPMQm","type":"text","x":328.70046398438546,"y":345.1557680981428,"width":40,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":\[],"frameId":null,"index":"al","roundness":null,"seed":593997754,"version":12,"versionNonce":1608722618,"isDeleted":false,"boundElements":null,"updated":1749349646240,"link":null,"locked":false,"text":"访问","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"H8rKEEisbVNsXKp-wykBr","originalText":"访问","autoResize":true,"lineHeight":1.25},{"id":"UKGLiX0p-YH-EFR8Vn2mr","type":"arrow","x":572.6766321135829,"y":364.3541961029005,"width":90.67453611731639,"height":0.9159044052253762,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"ao","roundness":{"type":2},"seed":827345978,"version":97,"versionNonce":112407994,"isDeleted":false,"boundElements":\[{"type":"text","id":"viOls34zbzxgEKLYNBvQ2"}],"updated":1749349713067,"link":null,"locked":false,"points":\[\[0,0],\[90.67453611731639,0.9159044052253762]],"lastCommittedPoint":\[90.67453611731639,0.9159044052253762],"startBinding":{"elementId":"B-TnjMweULNOknk3E1GxC","focus":0.05089921259680541,"gap":1},"endBinding":{"elementId":"IOPp3pUqgazx4gwIefWlq","focus":-0.12497460560879037,"gap":9.252631799900769},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false},{"id":"viOls34zbzxgEKLYNBvQ2","type":"text","x":606.1639093275145,"y":352.31214830551323,"width":23.699981689453125,"height":25,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"ap","roundness":null,"seed":1096423206,"version":9,"versionNonce":1258486886,"isDeleted":false,"boundElements":null,"updated":1749349712089,"link":null,"locked":false,"text":"url","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"UKGLiX0p-YH-EFR8Vn2mr","originalText":"url","autoResize":true,"lineHeight":1.25},{"id":"dVeEnMFPXne3mLIwyw8Mb","type":"arrow","x":840.1207184394049,"y":361.6064828872242,"width":106.24491100614853,"height":1.831808810450866,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"aq","roundness":{"type":2},"seed":2096655994,"version":38,"versionNonce":1033520826,"isDeleted":false,"boundElements":\[{"type":"text","id":"oM8reGJUaxBb\_-HYnp9l-"}],"updated":1749349734264,"link":null,"locked":false,"points":\[\[0,0],\[106.24491100614853,1.831808810450866]],"lastCommittedPoint":\[106.24491100614853,1.831808810450866],"startBinding":{"elementId":"IOPp3pUqgazx4gwIefWlq","focus":-0.0402428513284828,"gap":1},"endBinding":{"elementId":"So6T6xOhO9V59KYyzF9RR","focus":-0.08414577802163213,"gap":6.532879203481571},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false},{"id":"oM8reGJUaxBb\_-HYnp9l-","type":"text","x":866.7431892012683,"y":337.52238729244965,"width":52.999969482421875,"height":50,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"ar","roundness":null,"seed":2011229606,"version":19,"versionNonce":886389606,"isDeleted":false,"boundElements":null,"updated":1749349732778,"link":null,"locked":false,"text":"proxy\\npass","fontSize":20,"fontFamily":5,"textAlign":"center","verticalAlign":"middle","containerId":"dVeEnMFPXne3mLIwyw8Mb","originalText":"proxy\\npass","autoResize":true,"lineHeight":1.25},{"id":"H8VxDQhA12P3wJJzdEzri","type":"arrow","x":1108.7738994603958,"y":340.93892775684577,"width":97.36908293834381,"height":136.85532598276922,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"as","roundness":{"type":2},"seed":1188388730,"version":261,"versionNonce":1749418554,"isDeleted":false,"boundElements":\[],"updated":1749349823830,"link":null,"locked":false,"points":\[\[0,0],\[15.50560252368382,-119.13230444969852],\[97.36908293834381,-136.85532598276922]],"lastCommittedPoint":\[102.8587944269234,-160.66373674949205],"startBinding":{"elementId":"So6T6xOhO9V59KYyzF9RR","focus":0.9252844808683932,"gap":1},"endBinding":{"elementId":"U09Ff87hN7lvEfVF4JMcj","focus":0.38966867293861596,"gap":1},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false},{"id":"64WPH\_tyCWlN53uyaeLa-","type":"arrow","x":1107.2780483597949,"y":362.06861570749754,"width":95.20814029599524,"height":1.7001453624284295,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"at","roundness":{"type":2},"seed":323459366,"version":75,"versionNonce":917095738,"isDeleted":false,"boundElements":\[],"updated":1749349776380,"link":null,"locked":false,"points":\[\[0,0],\[95.20814029599524,1.7001453624284295]],"lastCommittedPoint":\[95.20814029599524,1.7001453624284295],"startBinding":{"elementId":"So6T6xOhO9V59KYyzF9RR","focus":-0.029077562876393345,"gap":1},"endBinding":{"elementId":"lk2BLB8WQ7HJT3TfoPR7-","focus":-0.09957360979564908,"gap":4.575512074593462},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false},{"id":"imgn4DN8LQitiCCaHZoXr","type":"arrow","x":1108.9693046822226,"y":372.2181800323087,"width":93.03338758406562,"height":147.07395400088865,"angle":0.00034771364976560193,"strokeColor":"#1e1e1e","backgroundColor":"#ffec99","fillStyle":"hachure","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":80,"groupIds":\[],"frameId":null,"index":"ax","roundness":{"type":2},"seed":2023176486,"version":520,"versionNonce":441574522,"isDeleted":false,"boundElements":\[],"updated":1749349831623,"link":null,"locked":false,"points":\[\[0,0],\[16.169334641726063,127.89622595719649],\[93.03338758406562,147.07395400088865]],"lastCommittedPoint":null,"startBinding":{"elementId":"So6T6xOhO9V59KYyzF9RR","focus":-0.9447307162508431,"gap":1},"endBinding":{"elementId":"OMK-Nu842s0oxxKk3-IDo","focus":-0.44016598846298605,"gap":5.594726113951992},"startArrowhead":null,"endArrowhead":"arrow","elbowed":false}],"files":{}}'/>
+
+### Nginx的安装与使用(以Debian为例)
+
+#### 安装Nginx
+
+```bash
+sudo apt-get update
+sudo apt-get install nginx -y
+```
+
+#### 启动与状态检查
+
+```bash
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+```
+
+访问服务器公网 IP，若出现 `Welcome to nginx`，说明部署成功
+
+### 构建反代+静态网站配置示例
+
+由于目前大多数网页服务都跑的是后端服务(即Node.js、Python、PHP)，所以只介绍反向代理的配置方法
+
+**假设我们有一个域名`jerry.crystelf.top`**
+
+我们可以通过以下步骤使Nginx将访问本域名的流量**转发**到内网的目标端口上，这里**假设我们的服务跑在`127.0.0.1:3000`上**
+
+#### 配置Nginx文件
+
+```bash
+sudo nano /etc/nginx/sites-available/jerry.crystelf.top.conf # 编辑配置文件,可以直接粘贴到文本编辑器
+```
+
+以下为`jerry.crystelf.top`的完整`Server`块配置：
+
+```nginx
+ server {
+   listen 80;
+   server_name jerry.crystelf.top; # 自行修改域名
+   root /var/www/jerry.crystelf.top; # 自行修改域名
+   index index.php index.html index.htm default.php default.html default.htm;
+
+   # 防止访问敏感文件
+   location ~ ^/(.user.ini|.htaccess|.git|.svn|.project|LICENSE|README.md|package.json|package-lock.json|.env) {
+       return 404;
+   }
+
+   # Let's Encrypt 验证目录
+   location /.well-known/ {
+       allow all;
+   }
+
+   # 禁止验证目录运行脚本
+   if ($uri ~ "^/\.well-known/.*\.(php|jsp|py|js|css|lua|ts|go|zip|tar\.gz|rar|7z|sql|bak)$") {
+       return 403;
+   }
+
+   # 缓存图片/多媒体
+   location ~* \.(gif|jpg|jpeg|png|bmp|swf)$ {
+       expires 30d;
+       access_log off;
+       error_log off;
+   }
+
+   # 缓存 CSS 和 JS
+   location ~* \.(js|css)?$ {
+       expires 12h;
+       access_log off;
+       error_log off;
+   }
+
+   # 反向代理 Web 服务
+   location ^~ / {
+       proxy_pass http://127.0.0.1:3000; # 自行修改端口
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+       proxy_set_header X-Forwarded-Host $http_host;
+       proxy_set_header X-Forwarded-Port $server_port;
+       proxy_set_header REMOTE-HOST $remote_addr;
+       proxy_set_header REMOTE-PORT $remote_port;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_http_version 1.1;
+       proxy_set_header Connection "upgrade";
+
+       add_header X-Cache $upstream_cache_status;
+
+       # 判断静态资源缓存
+       set $static_filejy2IN4nl 0;
+       if ($uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$") {
+           set $static_filejy2IN4nl 1;
+           expires 1m;
+       }
+       if ($static_filejy2IN4nl = 0) {
+           add_header Cache-Control no-cache;
+       }
+   }
+
+   access_log /var/log/nginx/jerry.crystelf.top.access.log; #根据需要修改
+   error_log /var/log/nginx/jerry.crystelf.top.error.log; #根据需要修改
+ }
+```
+
+#### 创建软链接启用站点
+
+```bash
+sudo ln -s /etc/nginx/sites-available/jerry.crystelf.top.conf /etc/nginx/sites-enabled/jerry.crystelf.top.conf
+```
+
+#### 创建网站目录
+
+```bash
+sudo mkdir -p /var/www/jerry.crystelf.top
+sudo chown -R www-data:www-data /var/www/jerry.crystelf.top
+```
+
+#### 测试并重载
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 当云服务器资源不足：使用 FRP 本地运行服务 + 内网穿透
+
+#### **为什么用 FRP？**
+
+有时候，云服务器性能不足、不便部署繁重服务，可以在本地机器运行 Web 服务，然后通过**FRP**穿透本地内网，将服务**暴露**到公网服务器上
+
+#### frp工作原理
+
+- frpc 运行在内网客户端，连接公网服务器的 frps
+- 公网服务器监听某个端口（如 7000），将访问转发回本地服务
+- 与 Nginx 配合，即可使用域名访问内网服务
+
+#### FRP 配置示例
+
+**公网服务器（frps.ini）**
+
+```ini
+[common]
+bind_port = 7000
+token = password
+```
+
+其中token为验证密钥，自行修改
+
+**本地机器（frpc.ini）：**
+
+```ini
+[common]
+server_addr = your.server.ip
+server_port = 7000
+token = password
+ 
+[web]
+type = tcp
+local_port = 3000
+remote_port = 2000
+```
+
+其中
+- `[web]`为你给这个隧道起的名字
+- `type`为连接类型，一般使用`tcp`进行连接
+- `local_port`为本地运行服务的端口
+- `remote_port`为你想要映射到公网服务器的什么端口
+
+#### frp启动命令:
+
+```bash
+# 启动 frps
+./frps -c ./frps.ini
+  
+# 启动 frpc
+./frpc -c ./frpc.ini
+ 
+```
+
+### 使用 Certbot 自动申请 HTTPS 证书
+
+为了让网站支持 HTTPS，我们可以使用 `Let's Encrypt` 提供的免费证书，搭配 `certbot` 工具一键申请并自动续期
+
+```bash
+# 安装 certbot
+sudo apt-get install certbot python3-certbot-nginx -y
+
+# 自动配置并签发证书
+sudo certbot --nginx
+
+# 测试自动续期
+sudo certbot renew --dry-run
+```
+
+### 总结
+
+本文介绍了使用 Nginx 部署网站和反代服务的方法，并结合 frp 实现了内网穿透的场景，最后引入 Certbot 实现 HTTPS 支持
+
+无论你是在云服务器上部署静态网站，还是通过本地运行配合反代，Nginx + FRP 是一套高效灵活的 Web 架构方案
