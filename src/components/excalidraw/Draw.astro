@@ -1,25 +1,31 @@
 ---
-import ReactDraw from './DrawReact.tsx';
+import ReactDraw from './DrawReact.tsx'
 
+/*
+ * Copyright 2025 CWorld
+ * Licensed under the Apache License, Version 2.0.
+ *
+ * Modifications made by Jerry on 2025.
+ */
 interface DrawProps {
-  children?: any;
-  data?: string;
-  width?: string;
-  height?: string;
-  className?: string;
-  viewModeEnabled?: boolean;
-  zenModeEnabled?: boolean;
+  children?: any
+  data?: string
+  width?: string
+  height?: string
+  className?: string
+  viewModeEnabled?: boolean
+  zenModeEnabled?: boolean
 }
 
-const { 
+const {
   children,
-  data, 
-  width = "100%", 
-  height = "400px", 
-  className = "",
+  data,
+  width = '100%',
+  height = '400px',
+  className = '',
   viewModeEnabled = true,
   zenModeEnabled = false
-}: DrawProps = Astro.props;
+}: DrawProps = Astro.props
 ---
 
 <ReactDraw

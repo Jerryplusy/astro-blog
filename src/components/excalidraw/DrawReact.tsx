@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 
 import ExcalidrawViewer from './ExcalidrawViewer.tsx'
 
+/*
+ * Copyright 2025 CWorld
+ * Licensed under the Apache License, Version 2.0.
+ *
+ * Modifications made by Jerry on 2025.
+ */
 interface DrawProps {
   children?: any
   data?: string

@@ -8,6 +8,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import BlockLoading from '../BlockLoading.tsx'
 
+/*
+ * Copyright 2025 CWorld
+ * Licensed under the Apache License, Version 2.0.
+ *
+ * Modifications made by Jerry on 2025.
+ */
 interface ExcalidrawViewerProps {
   data: string
   width?: string

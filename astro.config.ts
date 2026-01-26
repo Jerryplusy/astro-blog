@@ -5,6 +5,13 @@ import { defineConfig, fontProviders } from 'astro/config'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
+/*
+ * Copyright 2025 CWorld
+ * Licensed under the Apache License, Version 2.0.
+ *
+ * Modifications made by Jerry on 2025.
+ */
+
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
 // Shiki
