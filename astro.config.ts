@@ -51,7 +51,23 @@ export default defineConfig({
       'process.env': {}
     },
     optimizeDeps: {
-      include: ['@excalidraw/excalidraw']
+      include: ['@excalidraw/excalidraw'],
+      esbuildOptions: {
+        target: 'es2022',
+        treeShaking: true // 强制摇树
+      }
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // 拆分 Excalidraw 语言包
+            if (id.includes('locales') && !/en.json/.test(id)) {
+              return 'locales/chunk'
+            }
+          }
+        }
+      }
     },
     server: {
       allowedHosts: ['Jerryplusy.ink', 'jerry.crystelf.top', 'jerryplusy.ink']
@@ -63,18 +79,20 @@ export default defineConfig({
 
   // [Adapter]
   // https://docs.astro.build/en/guides/deploy/
-  //adapter: vercel(),
   output: 'static',
-  // Local (standalone)
-  // adapter: node({ mode: 'standalone' }),
-  // output: 'server',
 
   // [Assets]
   image: {
     responsiveStyles: true,
     service: {
       entrypoint: 'astro/assets/services/sharp'
-    }
+    },
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ghchart.rshah.org'
+      }
+    ]
   },
 
   // [Markdown]
