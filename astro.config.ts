@@ -95,6 +95,23 @@ export default defineConfig({
     ]
   },
 
+  // [Fonts]
+  fonts: [
+    {
+      provider: fontProviders.fontshare(),
+      name: 'Satoshi',
+      cssVariable: '--font-satoshi',
+      // Default included:
+      // weights: [400],
+      // styles: ["normal", "italics"],
+      // subsets: ["cyrillic-ext", "cyrillic", "greek-ext", "greek", "vietnamese", "latin-ext", "latin"],
+      // fallbacks: ["sans-serif"],
+      styles: ['normal', 'italic'],
+      weights: [400, 500],
+      subsets: ['latin']
+    }
+  ],
+
   // [Markdown]
   markdown: {
     remarkPlugins: [remarkMath],
@@ -150,23 +167,6 @@ export default defineConfig({
     contentIntellisense: true,
     // Enable SVGO optimization for SVG assets
     // https://docs.astro.build/en/reference/experimental-flags/svg-optimization/
-    svgo: true,
-    // Enable font preloading and optimization
-    // https://docs.astro.build/en/reference/experimental-flags/fonts/
-    fonts: [
-      {
-        provider: fontProviders.fontshare(),
-        name: 'Satoshi',
-        cssVariable: '--font-satoshi',
-        // Default included:
-        // weights: [400],
-        // styles: ["normal", "italics"],
-        // subsets: ["cyrillic-ext", "cyrillic", "greek-ext", "greek", "vietnamese", "latin-ext", "latin"],
-        // fallbacks: ["sans-serif"],
-        styles: ['normal', 'italic'],
-        weights: [400, 500],
-        subsets: ['latin']
-      }
-    ]
+    svgo: true
   }
 })
