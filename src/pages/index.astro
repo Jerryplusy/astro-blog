@@ -82,13 +82,21 @@ if (!images[imagePath])
         <Card
           as='a'
           heading='盐田高级中学'
-          subheading='OI 信息校队 & Turing竞赛社'
+          subheading='2025届 Turing 竞赛社 社长'
           date='August 2024 - Present'
           href=''
         >
           <img
-            class='absolute end-0 z-0 m-0 -my-3 h-full w-1/3 object-cover opacity-40'
-            src='/images/ytgj.svg'
+            class='absolute end-0 z-0 m-0 -my-3 h-full w-1/3 object-cover opacity-40 dark:hidden'
+            src='/images/ytgj-light.svg'
+            alt=''
+            aria-hidden='true'
+          />
+          <img
+            class='absolute end-0 z-0 m-0 -my-3 h-full w-1/3 object-cover opacity-40 hidden dark:block'
+            src='/images/ytgj-dark.svg'
+            alt=''
+            aria-hidden='true'
           />
         </Card>
       </Section>
