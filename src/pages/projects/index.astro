@@ -6,8 +6,8 @@ import PageLayout from '@/layouts/CommonPage.astro'
 import ProjectSection from '@/components/projects/ProjectSection.astro'
 
 const headings = [
-  { depth: 2, slug: 'programs', text: 'Programs' },
-  { depth: 2, slug: 'learnings', text: 'Learnings' }
+  { depth: 2, slug: 'active-projects', text: 'Active Projects' },
+  { depth: 2, slug: 'legacy-projects', text: 'Legacy Projects' }
 ]
 ---
 
@@ -22,23 +22,44 @@ const headings = [
     />
   </p>
 
-  <h2 id='programs'>Programs</h2>
+  <h2 id='active-projects'>Active Projects</h2>
   <ProjectSection
     projects={[
       {
-        name: 'Crystelf-core',
-        description: 'A simple, fast and powerful api.',
+        name: 'Mioku',
+        description: 'Core development in progress for the Mioku ecosystem.',
         links: [
-          { type: 'github', href: 'https://github.com/crystelf/crystelf-core' },
-          { type: 'doc', href: 'https://docs.crystelf.top/core' }
+          { type: 'github', href: 'https://github.com/mioku-lab/mioku' }
+        ]
+      },
+      {
+        name: 'Mioki (Maintenance)',
+        description: 'Participating in maintenance work for the mioki project.',
+        links: [
+          { type: 'github', href: 'https://github.com/vikiboss/mioki' }
         ]
       }
     ]}
   />
-  <Collapse title='Some old projects'>
-    <ProjectSection projects={[]} />
-  </Collapse>
 
-  <h2 id='learnings'>Learnings</h2>
-  <ProjectSection class='my-2' projects={[]} />
+  <h2 id='legacy-projects'>Legacy Projects</h2>
+  <Collapse title='Some old projects'>
+    <ProjectSection
+      projects={[
+        {
+          name: 'Crystelf-core',
+          description: 'A simple, fast and powerful API framework.',
+          links: [
+            { type: 'github', href: 'https://github.com/crystelf/crystelf-core' },
+            { type: 'doc', href: 'https://docs.crystelf.top/core' }
+          ]
+        },
+        {
+          name: 'Crystelf-plugin',
+          description: 'Plugin collection and integrations for the Crystelf ecosystem.',
+          links: [{ type: 'github', href: 'https://github.com/Jerryplusy/crystelf-plugin' }]
+        }
+      ]}
+    />
+  </Collapse>
 </PageLayout>
