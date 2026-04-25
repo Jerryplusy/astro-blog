@@ -37,7 +37,7 @@ export default function ExcalidrawViewer({
   className = '',
   viewModeEnabled = true,
   zenModeEnabled = false,
-  showExtendButton = true,
+  showExtendButton: _showExtendButton = true,
   onChange,
   onReady
 }: ExcalidrawViewerProps) {

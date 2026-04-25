@@ -1,5 +1,6 @@
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
 import react from '@astrojs/react'
+import sitemap from '@astrojs/sitemap'
 import AstroPureIntegration from 'astro-pure'
 import { defineConfig, fontProviders } from 'astro/config'
 import rehypeKatex from 'rehype-katex'
@@ -152,6 +153,7 @@ export default defineConfig({
   integrations: [
     // React support for Excalidraw
     react(),
+    sitemap(),
     // astro-pure will automatically add sitemap, mdx & unocss
     // sitemap(),
     // mdx(),
