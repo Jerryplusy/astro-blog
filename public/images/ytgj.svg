@@ -4,31 +4,55 @@
             .cls-yellow { fill: #FFC107; }
             .cls-red { fill: #F44336; }
             .cls-blue { fill: #03A9F4; }
+            .cls-word {
+                fill: #FFFFFF;
+                font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+                font-size: 20px;
+                font-style: italic;
+                letter-spacing: 0.4px;
+            }
+            .cls-word-sub {
+                font-size: 13px;
+                letter-spacing: 0.2px;
+            }
         </style>
+        <mask id="ytgj-cutouts" x="0" y="0" width="256" height="256" maskUnits="userSpaceOnUse">
+            <rect width="256" height="256" fill="#fff" />
+            <g stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="58" y1="58" x2="198" y2="58" />
+                <line x1="58" y1="58" x2="58" y2="198" />
+                <line x1="198" y1="58" x2="198" y2="198" />
+                <line x1="58" y1="198" x2="198" y2="198" />
+            </g>
+        </mask>
     </defs>
-    <path class="cls-yellow" d="
-    M 120 120
-    L 65 120
-    A 55 55 0 0 1 65 10
-    A 55 55 0 0 1 120 65
-    Z"
-    />
+    <g mask="url(#ytgj-cutouts)">
+        <path class="cls-yellow" d="
+        M 120 120
+        L 65 120
+        A 55 55 0 0 1 65 10
+        A 55 55 0 0 1 120 65
+        Z"
+        />
 
-    <path class="cls-red" d="
-    M 136 120
-    L 136 65
-    A 55 55 0 0 1 191 10
-    A 55 55 0 0 1 191 120
-    Z"
-    />
+        <path class="cls-red" d="
+        M 136 120
+        L 136 65
+        A 55 55 0 0 1 191 10
+        A 55 55 0 0 1 191 120
+        Z"
+        />
 
-    <path class="cls-blue" d="
-    M 120 136
-    L 120 191
-    A 55 55 0 0 1 65 246
-    A 55 55 0 0 1 10 191
-    A 55 55 0 0 1 65 136
-    Z"
-    />
+        <path class="cls-blue" d="
+        M 120 136
+        L 120 191
+        A 55 55 0 0 1 65 246
+        A 55 55 0 0 1 10 191
+        A 55 55 0 0 1 65 136
+        Z"
+        />
+    </g>
+    <text class="cls-word" x="140" y="155">Yantian</text>
+    <text class="cls-word cls-word-sub" x="140" y="175">Senior High School</text>
 
 </svg>
