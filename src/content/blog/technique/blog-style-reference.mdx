@@ -1,0 +1,267 @@
+---
+title: '鸽了很久了，更一篇'
+publishDate: '2026-04-25'
+description: '常用的 Markdown、MDX、Astro 写法列举'
+tags:
+  - Markdown
+  - MDX
+  - Astro
+language: 'Chinese'
+draft: false
+---
+import {
+  Aside,
+  Button,
+  Card,
+  CardList,
+  Collapse,
+  FormattedDate,
+  Icon,
+  Label,
+  MdxRepl,
+  Spoiler,
+  Steps,
+  Svg,
+  TabItem,
+  Tabs,
+  Timeline
+} from 'astro-pure/user'
+import { GithubCard, LinkPreview, QRCode, Quote } from 'astro-pure/advanced'
+export const keyIcon = import('@/assets/icons/key.svg?raw')
+
+export const today = new Date('2026-04-25T00:00:00+08:00')
+
+export const timelineEvents = [
+  { date: '2024-08', content: '将博客迁移至 Astro' },
+  { date: '2025-01', content: '引入 MDX 组件，文章可玩性提高' },
+  { date: '2026-04', content: '优化样式及显示效果' },
+]
+
+export const roadmapList = [
+  {
+    title: '数学',
+    children: [
+      { title: '导数的隐零点问题' },
+      { title: '非线性回归预测模型' }
+    ]
+  },
+  {
+    title: '物理',
+    children: [
+      { title: '电磁感应与运动学综合' },
+      { title: '光电效应与原子物理' }
+    ]
+  },
+  {
+    title: '信息',
+    children: [{ title: '区间DP与嵌套DP' }, { title: '图论与二叉树综合' }]
+  }
+]
+
+很久没更新了，每天都忙着在学校学学学 :(
+
+这篇文章会把博客的常用样式都在这里渲染一遍，方便以后自查。
+
+## Markdown
+
+### 行内文本
+
+- **粗体**
+- *斜体*
+- ~~删除线~~
+- `行内代码`
+- <u>下划线</u>
+- 上标: X<sup>2</sup>
+- 下标: H<sub>2</sub>O
+- 快捷键: <kbd>Cmd</kbd> + <kbd>K</kbd>
+- Spoiler: <Spoiler>你知道的太多了</Spoiler>
+
+### 引用&分隔线
+
+> 鲁迅：我没说过这句话。
+
+---
+
+### 列表
+
+有序列表
+
+1. 先分析重力
+2. 再分析弹力
+3. 最后分析摩擦力
+
+无序列表
+
+- 羧酸可以和醇类物质发生酯化反应
+- 蔗糖在碱性条件下可以与斐林试剂发生显色反应，而酸性条件下则不能
+- 分子内含有手性碳原子代表分子存在空间异构体
+
+任务列表
+
+- [x] 编写框架
+- [x] 补齐样式
+- [ ] 撰写文档
+
+脚注[^style-note]
+
+### 表格
+
+| 分布列 | 数据1 | 数据2 | 数据3 |
+|-----|-----|-----|-----|
+| X   | 0.2 | 0.5 | 0.9 |
+| P   | 0.1 | 0.4 | 0.5 |
+
+### 代码块
+
+```ts title="src/example/style-helper.ts"
+export function formatTitle(raw: string) {
+  return raw.trim().replace(/\s+/g, ' ')
+}
+```
+
+```ts
+const oldApi = '/api/v1/post' // [!code --]
+const newApi = '/api/v2/post' // [!code ++]
+const method = 'GET'
+
+console.log(method, newApi) // [!code highlight]
+```
+
+```bash title="scripts/release-check.sh"
+#!/usr/bin/env bash
+set -e
+echo "1) lint"
+echo "2) typecheck"
+echo "3) build"
+echo "4) preview"
+echo "5) publish"
+echo "6) done"
+echo "line 7"
+echo "line 8"
+echo "line 9"
+echo "line 10"
+echo "line 11"
+echo "line 12"
+echo "line 13"
+echo "line 14"
+echo "line 15"
+echo "line 16"
+echo "line 17"
+```
+
+### 数学公式
+
+行内公式: $E = mc^2$
+
+块级公式:
+
+$$
+\int_{0}^{1} x^2 \, dx = \frac{1}{3}
+$$
+
+### 折叠
+
+<details>
+  <summary>展开</summary>
+  <p>你想看什么</p>
+</details>
+
+## MDX
+
+### Card
+
+<Card heading='卡片'>
+  <p className='m-0 text-muted-foreground'>要变成卡片的内容</p>
+</Card>
+
+### Collapse
+
+<Collapse title='这个比details好用'>
+  <ul>
+    <li>你想看什么</li>
+    <li>这里面什么都没有</li>
+  </ul>
+</Collapse>
+
+### Aside
+
+<Aside type='note' title='Note'>
+  陶渊明在撰写归去来兮辞的时候还并没有抵达田园
+</Aside>
+
+<Aside type='tip' title='Tip'>
+  选择题计算量较大的时候可以连蒙带猜
+</Aside>
+
+<Aside type='caution' title='Caution'>
+  快速排序不稳定，尽量少用
+</Aside>
+
+<Aside type='danger' title='Danger'>
+  进行函数运算务必考虑定义域
+</Aside>
+
+### Tabs & TabItem
+
+<Tabs syncKey='runtime'>
+  <TabItem label='Bun'>
+
+```bash
+bun run dev
+```
+
+  </TabItem>
+  <TabItem label='Node'>
+
+```bash
+npm run dev
+```
+
+  </TabItem>
+</Tabs>
+
+### MdxRepl
+
+<MdxRepl width='100%'>
+  <p className='text-sm text-muted-foreground'>
+    这个容器适合放 demo，本体和说明能放一起
+  </p>
+</MdxRepl>
+
+### CardList
+
+<CardList title='学习清单' list={roadmapList} />
+
+### Timeline
+
+<Timeline events={timelineEvents} />
+
+### Steps
+
+<Steps>
+1. 进入Minecraft服务器
+2. 在机器上跳来跳去
+3. 下线
+</Steps>
+
+## Advanced
+
+### Quote
+
+<Quote />
+
+### GithubCard
+
+<GithubCard repo='mioku-lab/mioku' />
+
+### LinkPreview
+
+<LinkPreview href='https://astro.build/' />
+
+隐去封面图
+
+<LinkPreview href='https://oi-wiki.org/' hideMedia />
+
+先写到这了，有别的之后再补充
+
+[^style-note]: 图片仅供参考，请以实物为准
