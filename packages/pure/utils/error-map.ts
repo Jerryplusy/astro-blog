@@ -3,8 +3,8 @@
  * source: https://github.com/withastro/astro/blob/main/packages/astro/src/content/error-map.ts
  */
 
-import type { z } from 'astro:content'
 import { AstroError } from 'astro/errors'
+import type { Schema, SafeParseReturnType, ZodErrorMap, ZodIssue, input, output } from 'astro/zod'
 
 type TypeOrLiteralErrByPathEntry = {
   code: 'invalid_type' | 'invalid_literal'
@@ -20,11 +20,11 @@ type TypeOrLiteralErrByPathEntry = {
  * @param message Error message preamble to use if the input fails to parse.
  * @returns Validated data parsed by Zod.
  */
-export function parseWithFriendlyErrors<T extends z.Schema>(
+export function parseWithFriendlyErrors<T extends Schema>(
   schema: T,
-  input: z.input<T>,
+  input: input<T>,
   message: string
-): z.output<T> {
+): output<T> {
   return processParsedData(schema.safeParse(input, { errorMap }), message)
 }
 
@@ -37,22 +37,22 @@ export function parseWithFriendlyErrors<T extends z.Schema>(
  * @param message Error message preamble to use if the input fails to parse.
  * @returns Validated data parsed by Zod.
  */
-export async function parseAsyncWithFriendlyErrors<T extends z.Schema>(
+export async function parseAsyncWithFriendlyErrors<T extends Schema>(
   schema: T,
-  input: z.input<T>,
+  input: input<T>,
   message: string
-): Promise<z.output<T>> {
+): Promise<output<T>> {
   return processParsedData(await schema.safeParseAsync(input, { errorMap }), message)
 }
 
-function processParsedData(parsedData: z.SafeParseReturnType<any, any>, message: string) {
+function processParsedData(parsedData: SafeParseReturnType<any, any>, message: string) {
   if (!parsedData.success) {
-    throw new AstroError(message, parsedData.error.issues.map((i) => i.message).join('\n'))
+    throw new AstroError(message, parsedData.error.issues.map((i: ZodIssue) => i.message).join('\n'))
   }
   return parsedData.data
 }
 
-const errorMap: z.ZodErrorMap = (baseError, ctx) => {
+const errorMap: ZodErrorMap = (baseError, ctx) => {
   const baseErrorPath = flattenErrorPath(baseError.path)
   if (baseError.code === 'invalid_union') {
     // Optimization: Combine type and literal errors for keys that are common across ALL union types
@@ -69,7 +69,7 @@ const errorMap: z.ZodErrorMap = (baseError, ctx) => {
         } else {
           typeOrLiteralErrByPath.set(flattenedErrorPath, {
             code: unionError.code,
-            received: (unionError as any).received,
+            received: unionError.received,
             expected: [unionError.expected]
           })
         }
@@ -164,7 +164,9 @@ const unionExpectedVals = (expectedVals: Set<unknown>) =>
 const flattenErrorPath = (errorPath: (string | number)[]) => errorPath.join('.')
 
 /** `JSON.stringify()` a value with spaces around object/array entries. */
-const stringify = (val: unknown) =>
-  JSON.stringify(val, null, 1).split(newlinePlusWhitespace).join(' ')
+const stringify = (val: unknown) => {
+  const serialized = JSON.stringify(val, null, 1)
+  return (serialized ?? String(val)).split(newlinePlusWhitespace).join(' ')
+}
 const newlinePlusWhitespace = /\n\s*/
 const leadingPeriod = /^\./

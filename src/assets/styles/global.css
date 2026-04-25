@@ -115,6 +115,23 @@ span.katex-display {
   }
 }
 
+/* [Header] */
+body header-component.not-top {
+  background-color: hsl(var(--background) / 0.78);
+  border-color: hsl(var(--border) / 0.58);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  backdrop-filter: saturate(140%) blur(10px);
+  box-shadow:
+    rgb(255 255 255 / 0) 0 0 0 0,
+    rgb(24 24 27 / 0.08) 0 0 0 1px,
+    rgb(39 39 42 / 0.06) 0 8px 14px -4px,
+    rgb(39 39 42 / 0.04) 0 3px 8px -5px;
+}
+.dark body header-component.not-top {
+  background-color: hsl(var(--muted) / 0.72);
+  border-color: hsl(var(--border) / 0.52);
+}
+
 /* [Shiki transformer] */
 .astro-code {
   /* Title */
