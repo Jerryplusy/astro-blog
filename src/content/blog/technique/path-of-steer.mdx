@@ -1,0 +1,121 @@
+---
+title: '大模型steer知识编辑调参之路'
+publishDate: '2026-07-04'
+description: '复盘第一眼看到题目的想法以及一些踩过的坑'
+tags:
+  - steer
+  - ai
+language: 'Chinese'
+draft: false
+---
+
+最近参加了 Steer 大模型行为调控（Steering）比赛
+
+Steer 的目标并不是通过 Prompt 去引导模型，而是直接干预模型内部表示（Activation），让模型在尽量不影响原有能力的情况下，
+稳定表现出指定的行为、风格或概念。这也是近年来大模型可控生成（Controllable Generation）中比较热门的一个方向。
+
+这是我第一次比较系统地接触 Activation Steering。
+虽然了解过一些相关内容，但真正自己从零开始调参、分析中间层激活、验证不同方法，还是第一次
+
+整个过程中中踩了不少坑，也推翻了很多一开始觉得理所当然的想法或一些错误。
+
+### 最初的方法
+
+一开始采用的是最常见的 CAA（Contrastive Activation Addition）：
+
+```python
+steering_vector = mean(act_pos) - mean(act_neg)
+
+def apply_steering(residual, layer, multiplier):
+    residual[layer] += multiplier * steering_vector
+    return residual
+```
+
+这种方法对于人格、情绪、语气等行为类 Concept 确实有效
+
+随着 multiplier 增大，可以明显感觉到模型输出的情绪发生变化
+
+但是，对于需要模型输出某个特定单词或短语的 Concept（L3），几乎始终无法达到理想效果。
+
+### 为什么效果会越来越差
+
+进一步分析数据后发现一个很容易忽略的问题
+
+SteerEval 中，大部分 positive / negative 都属于最小编辑对（minimal pair）
+
+例如：
+
+```
+Positive:
+I think ... sonder ...
+
+Negative:
+I think ... empathy ...
+```
+
+但实际实现中是这样计算的：
+
+```python
+acts = get_activations(model, prompt)
+
+# 对整个 answer 做 mean pooling
+steering = acts[:, answer_start:, :].mean(dim=1)
+```
+
+两段回答绝大多数 token 完全相同，只在极少数位置发生变化。
+
+而传统 CAA 使用的是：
+
+`mean(answer activations)`
+
+意味着：
+
+相同 token 的 activation 相互抵消
+真正有区别的 token 被整个回答长度平均
+
+最后得到的 steering vector 被严重稀释。
+
+行为类 Concept 还能保留一些整体方向，因此仍然有效。
+
+而词汇级 Concept，本来信号就十分局部，被平均以后**几乎完全消失**
+
+### 尝试过的方案
+
+后来，我尝试直接利用目标 token 的 embedding 作为 steering 向量注入残差流
+
+```python
+target_embed = model.embed_tokens.weight[token_id]
+
+residual[layer] += multiplier * target_embed
+```
+
+这种方法确实能够让目标短语开始出现，但同时也伴随着明显的问题，例如 token 拼接、重复生成以及输出损坏。
+
+随后又尝试将注入位置移动到最后一层，虽然副作用有所减轻，但仍然需要非常大的 multiplier 才能生效，整体效果依然不够稳定
+
+最后，我放弃了继续依赖残差注入。
+
+### 选择合适的方法
+
+最后采用的是直接修改 logits
+
+利用 Hugging Face 的 LogitsProcessor，在生成过程中对目标 token 的 logit 添加固定 bias
+
+```python
+from transformers import LogitsProcessor
+
+class TokenBias(LogitsProcessor):
+    def __init__(self, target_id, bias=50.0):
+        self.target_id = target_id
+        self.bias = bias
+
+    def __call__(self, input_ids, scores):
+        scores[:, self.target_id] += self.bias
+        return scores
+```
+
+对于需要输出指定短语的 Concept，效果明显比 Activation Steering 更稳定
+
+### 写在最后
+
+不同的方法适合不同的样本，选择合适的方法往往能事半功倍
