@@ -7,7 +7,7 @@ export const theme: ThemeUserConfig = {
   /** Will be used in index page & copyright declaration */
   author: 'Jerryplusy',
   /** Description metadata for your website. Can be used in page metadata. */
-  description: 'Stay hungry, stay foolish',
+  description: '愿我们在清醒的明天再会',
   /** The default favicon for your site which should be a path to an image in the `public/` directory. */
   favicon: '/favicon/favicon.ico',
   /** The default social card image for your site which should be a path to an image in the `public/` directory. */

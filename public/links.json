@@ -3,7 +3,36 @@
     {
       "id_name": "cf-links",
       "desc": "Common links included in circle friends",
-      "link_list": []
+      "link_list": [
+        {
+          "name": "Zellon的博客",
+          "intro": "告别过去，是为了走向未来",
+          "link": "https://www.zellon.top/",
+          "avatar": "https://www.zellon.top/avatar.jpg",
+          "rss": "https://zellon.top/rss.xml"
+        },
+        {
+          "name": "Viki 写东西的地方",
+          "intro": "生活需要记录。",
+          "link": "https://blog.viki.moe",
+          "avatar": "https://blog.viki.moe/avatar.png",
+          "rss": "https://blog.viki.moe/rss"
+        },
+        {
+          "name": "Snowykami's Blog",
+          "intro": "A neo blog system",
+          "link": "https://blog.sfkm.me/",
+          "avatar": "https://cdn.liteyuki.org/snowykami/avatar.jpg",
+          "rss": "https://blog.sfkm.me/rss.xml"
+        },
+        {
+          "name": "Dogxi 的狗窝",
+          "intro": "Dogxi 的个人博客，因为热爱所以热爱",
+          "link": "https://blog.dogxi.me/",
+          "avatar": "https://blog.dogxi.me/avatar.png",
+          "rss": "https://blog.dogxi.me/rss.xml"
+        }
+      ]
     },
     {
       "id_name": "inactive-links",
