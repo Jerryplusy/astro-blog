@@ -1,8 +1,9 @@
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
-import AstroPureIntegration from 'astro-pure'
+import AstroLeekIntegration from 'astro-theme'
 import { defineConfig, fontProviders } from 'astro/config'
+import { fileURLToPath } from 'node:url'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
@@ -12,6 +13,24 @@ import remarkMath from 'remark-math'
  *
  * Modifications made by Jerry on 2025.
  */
+
+// Theme switcher: THEME=leek (default) | THEME=pure
+// Use regex aliases for exact-match (string keys in Vite do prefix matching which breaks subpaths).
+const THEME = process.env.THEME ?? 'leek'
+const themeRoot = fileURLToPath(new URL(`./packages/${THEME}`, import.meta.url))
+const themeAlias = [
+  { find: /^astro-theme\/types$/, replacement: `${themeRoot}/types/index.ts` },
+  { find: /^astro-theme\/utils$/, replacement: `${themeRoot}/utils/index.ts` },
+  { find: /^astro-theme\/server$/, replacement: `${themeRoot}/utils/server.ts` },
+  { find: /^astro-theme\/libs$/, replacement: `${themeRoot}/libs/index.ts` },
+  { find: /^astro-theme\/user$/, replacement: `${themeRoot}/components/user/index.ts` },
+  { find: /^astro-theme\/advanced$/, replacement: `${themeRoot}/components/advanced/index.ts` },
+  { find: /^astro-theme\/components\/basic$/, replacement: `${themeRoot}/components/basic/index.ts` },
+  { find: /^astro-theme\/components\/pages$/, replacement: `${themeRoot}/components/pages/index.ts` },
+  { find: /^astro-theme\/styles\/global\.css$/, replacement: `${themeRoot}/assets/styles/global.css` },
+  { find: /^astro-theme\/styles\/app\.css$/, replacement: `${themeRoot}/assets/styles/app.css` },
+  { find: /^astro-theme$/, replacement: `${themeRoot}/index.ts` }
+] as const
 
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
@@ -47,6 +66,10 @@ export default defineConfig({
 
   // [Vite Configuration]
   vite: {
+    // Theme alias: redirects all astro-theme/* imports to the active theme package
+    resolve: {
+      alias: themeAlias
+    },
     define: {
       global: 'globalThis',
       'process.env': {}
@@ -157,7 +180,7 @@ export default defineConfig({
     // astro-pure will automatically add sitemap, mdx & unocss
     // sitemap(),
     // mdx(),
-    AstroPureIntegration(config)
+    AstroLeekIntegration(config)
     // Compress recommend
     // https://docs.astro.build/en/guides/integrations-guide/partytown/
   ],

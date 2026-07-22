@@ -32,7 +32,7 @@ export default {
     '^@astrojs/(.*)$',
     '<THIRD_PARTY_MODULES>',
     '',
-    '^astro-pure/(.*)$',
+    '^astro-theme/(.*)$',
     '^@/types/(.*)$',
     '^@/layouts/(.*)$',
     '^@/pages/(.*)$',

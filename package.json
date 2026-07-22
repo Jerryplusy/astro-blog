@@ -1,20 +1,24 @@
 {
   "name": "logger",
   "workspaces": [
-    "packages/*"
+    "packages/leek"
   ],
   "type": "module",
   "version": "4.1.1",
   "scripts": {
     "dev": "astro dev",
     "dev:check": "astro check --watch & astro dev",
-    "build": "astro-pure check && astro check && astro build",
+    "dev:leek": "THEME=leek astro dev",
+    "dev:pure": "THEME=pure astro dev",
+    "build": "astro-theme check && astro check && astro build",
+    "build:leek": "THEME=leek astro-theme check && THEME=leek astro check && THEME=leek astro build",
+    "build:pure": "THEME=pure astro-theme check && THEME=pure astro check && THEME=pure astro build",
     "preview": "astro preview",
     "sync": "astro sync",
     "check": "astro check",
     "astro": "astro",
-    "pure": "astro-pure",
-    "new": "astro-pure new",
+    "theme": "astro-theme",
+    "new": "astro-theme new",
     "format": "prettier --write  '**/*.{js,jsx,ts,tsx,md,mdx,astro}'",
     "lint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx,astro}'",
     "yijiansilian": "bun lint && bun sync && bun check && bun format",
@@ -32,7 +36,7 @@
     "@types/react-dom": "18.2.0",
     "@waline/client": "^3.8.0",
     "astro": "6.1.6",
-    "astro-pure": "1.3.9",
+    "astro-theme": "workspace:*",
     "katex": "^0.16.25",
     "react": "18.2.0",
     "react-dom": "18.2.0",

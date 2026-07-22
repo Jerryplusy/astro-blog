@@ -1,11 +1,12 @@
 {
-  "name": "astro-pure",
+  "name": "astro-theme",
   "type": "module",
   "description": "A simple, clean but powerful blog theme build by astro.",
   "version": "1.3.9",
   "homepage": "https://astro-pure.js.org/",
   "author": "CWorld",
   "license": "Apache-2.0",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cworld1/astro-theme-pure.git",
@@ -22,9 +23,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": {
-    "astro-pure": "scripts/index.js"
-  },
   "exports": {
     ".": "./index.ts",
     "./user": "./components/user/index.ts",
@@ -34,7 +32,8 @@
     "./utils": "./utils/index.ts",
     "./server": "./utils/server.ts",
     "./types": "./types/index.ts",
-    "./libs": "./libs/index.ts"
+    "./libs": "./libs/index.ts",
+    "./styles/*": "./assets/styles/*"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.12",

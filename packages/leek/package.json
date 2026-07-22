@@ -1,0 +1,52 @@
+{
+  "name": "astro-theme",
+  "type": "module",
+  "description": "A forked blog theme (forked from astro-pure) for Jerry's ink.",
+  "version": "1.0.0",
+  "homepage": "https://jerryplusy.ink",
+  "author": "Jerryplusy",
+  "license": "Apache-2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jerryplusy/astro-blog.git",
+    "directory": "packages/leek"
+  },
+  "bugs": "https://github.com/Jerryplusy/astro-blog/issues",
+  "keywords": [
+    "astro-component",
+    "withastro",
+    "css",
+    "ui",
+    "renderer"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "astro-theme": "scripts/index.js"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./user": "./components/user/index.ts",
+    "./advanced": "./components/advanced/index.ts",
+    "./components/pages": "./components/pages/index.ts",
+    "./components/basic": "./components/basic/index.ts",
+    "./utils": "./utils/index.ts",
+    "./server": "./utils/server.ts",
+    "./types": "./types/index.ts",
+    "./libs": "./libs/index.ts",
+    "./styles/*": "./assets/styles/*"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.12",
+    "@astrojs/sitemap": "3.7.2",
+    "@pagefind/default-ui": "^1.4.0",
+    "@unocss/reset": "^66.5.10",
+    "astro": "6.1.6",
+    "hast-util-select": "^6.0.4",
+    "node-html-parser": "^7.0.1",
+    "pagefind": "^1.4.0",
+    "unocss": "^66.5.10"
+  }
+}
