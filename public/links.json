@@ -27,10 +27,10 @@
         },
         {
           "name": "Dogxi 的狗窝",
-          "intro": "Dogxi 的个人博客，因为热爱所以热爱",
-          "link": "https://blog.dogxi.me/",
-          "avatar": "https://blog.dogxi.me/avatar.png",
-          "rss": "https://blog.dogxi.me/rss.xml"
+          "intro": "把代码、日常和一点点远方，写进这里。",
+          "link": "https://dogxi.me",
+          "avatar": "https://dogxi.me/favicon.ico",
+          "rss": "https://dogxi.me/rss.xml"
         }
       ]
     },
